@@ -2,7 +2,10 @@
 
 PSQL="psql --username=freecodecamp --dbname=<database_name> -t --no-align -c"
 
-# USERNAME=read "Enter your username here:"
+# USERNAME= read "Enter your username here:"
+  # while no name is entered -z $USERNAME
+    # USERNAME= "Enter your username here:"
+
 # query database for $USERNAME
 # if username used before
   # "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
@@ -25,4 +28,8 @@ PSQL="psql --username=freecodecamp --dbname=<database_name> -t --no-align -c"
     # INPUT() "It's lower than that, guess again"
   # elif $NUMBER == $RANDOM
     # echo "You guessed it in $COUNT tries. The secret number was $RANDOM. Nice job!"
+    # $PSQL increment games played of $USERNAME
+    # $PSQL compare $COUNT to best game of $USERNAME
+    # if $COUNT is lower
+      # $PSQL overwrite best_game of $USERNAME
     # exit
