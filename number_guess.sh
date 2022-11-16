@@ -2,11 +2,11 @@
 
 PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
 
-echo "Enter your username here:"
+echo "Enter your username:"
 read USERNAME
 while [[ -z $USERNAME ]]
 do
-  echo "Enter your username here:"
+  echo "Enter your username:"
   read USERNAME
 done
 
@@ -17,15 +17,18 @@ then
   NAME_INSERT=$($PSQL "INSERT INTO users(name,games_played) VALUES('$USERNAME',0);")
   echo "Welcome, $USERNAME! It looks like this is your first time here."
 else
+  USERNAME=$($PSQL "SELECT name FROM users WHERE name='$USERNAME';")
   GAMES_PLAYED=$($PSQL "SELECT games_played FROM users WHERE name='$USERNAME';")
+  # count items of users as u join games as g on u.user_id=g.user_id where ... 
   BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE name='$USERNAME';")
+  # find minimum of tries users as u join games as g on u.user_id=g.user_id where ... 
   echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
 fi
 
 # create random number
 R=$(($RANDOM%1000+1))
 
-echo -e "Guess the secret number between 1 and 1000:"
+echo -e "\nGuess the secret number between 1 and 1000:"
 read NUMBER
 COUNT=1
 # echo $R, $COUNT, $NUMBER
@@ -39,14 +42,17 @@ do
     read NUMBER
   elif [[ $R > $NUMBER ]]
   then
-    echo "It's higher than that, guess again"
+    echo "It's higher than that, guess again:"
     read NUMBER
   elif [[ $NUMBER >  $R ]]
   then
-    echo "It's lower than that, guess again"
+    echo "It's lower than that, guess again:"
     read NUMBER
   fi
 done 
+
+# get user_id from users where name
+# insert into games(user_id, tries) values($USER_ID, $COUNT)
 
 if [[ ( $COUNT < $BEST_GAME ) ]]
 then
