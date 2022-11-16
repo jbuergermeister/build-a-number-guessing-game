@@ -18,20 +18,17 @@ then
   echo "Welcome, $USERNAME! It looks like this is your first time here."
 else
   USERNAME=$($PSQL "SELECT name FROM users WHERE name='$USERNAME';")
-  GAMES_PLAYED=$($PSQL "SELECT games_played FROM users WHERE name='$USERNAME';")
-  # count items of users as u join games as g on u.user_id=g.user_id where ... 
-  BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE name='$USERNAME';")
-  # find minimum of tries users as u join games as g on u.user_id=g.user_id where ... 
+  GAMES_PLAYED=$($PSQL "SELECT COUNT(tries) FROM users as u JOIN games as g ON u.user_id=g.user_id WHERE name='$USERNAME' AND tries IS NOT NULL;")
+  BEST_GAME=$($PSQL "SELECT MIN(tries) FROM users as u JOIN games as g ON u.user_id=g.user_id WHERE name='$USERNAME' AND tries IS NOT NULL;")
   echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
 fi
 
-# create random number
 R=$(($RANDOM%1000+1))
+# echo $R
 
 echo -e "\nGuess the secret number between 1 and 1000:"
 read NUMBER
 COUNT=1
-# echo $R, $COUNT, $NUMBER
 
 while [[ ! $NUMBER = $R ]]
 do
@@ -51,8 +48,8 @@ do
   fi
 done 
 
-# get user_id from users where name
-# insert into games(user_id, tries) values($USER_ID, $COUNT)
+USER_ID=$($PSQL "SELECT user_id FROM users WHERE name='$USERNAME';")
+INSERT_GAME=$($PSQL "INSERT INTO games(user_id, tries) VALUES($USER_ID, $COUNT);")
 
 if [[ ( $COUNT < $BEST_GAME ) ]]
 then
@@ -62,4 +59,4 @@ fi
 GAMES_PLAYED=$(($GAMES_PLAYED+1))
 UPDATE_PLAYED=$($PSQL "UPDATE users SET games_played=$GAMES_PLAYED WHERE name='$USERNAME';")
 
-echo "You guessed it in $COUNT tries. The secret number was $R. Nice job!"
+echo -e "\nYou guessed it in $COUNT tries. The secret number was $R. Nice job!"
